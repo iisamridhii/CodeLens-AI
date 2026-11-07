@@ -1,80 +1,429 @@
+
 # AI Code Reviewer
 
-This repository contains a Streamlit-based AI code review app and a small agent routing layer that selects different LLM providers depending on the review task.
+An AI-powered code review application built using Python, Streamlit, and multiple Large Language Model (LLM) providers.
 
-Overview
---------
+AI Code Reviewer uses a task-based routing system to perform specialized code analysis, including bug detection, security auditing, and deep architectural review.
 
-- UI: `app.py` — a Streamlit application where users upload or paste source code and run a review.
-- Review logic: `agents/reviewer.py` — orchestrates three review types (bugs, security, deep review).
-- Router: `agents/router.py` — maps review tasks to LLM client factories (Groq, Mistral, Gemini via LangChain integrations).
-- Outputs: `output/reports` (Markdown reports) and `output/charts` (PNG summary charts).
+---
 
-Prerequisites
--------------
+## Overview
 
-- Python 3.10+
-- Install dependencies listed in `requirements.txt`.
-- Provider API keys (for LLM clients) loaded via a `.env` file or environment variables.
+AI Code Reviewer allows developers to upload source code files or paste code directly into the application for automated analysis.
 
-Quick Start (Windows PowerShell)
--------------------------------
+The application uses three different LLM providers through LangChain integrations:
+
+- **Groq:** Used for quick bug detection.
+- **Mistral:** Used for security auditing.
+- **Google Gemini:** Used for deep architectural code review.
+
+The application provides a Streamlit interface to execute reviews, display results, generate Markdown reports, and create PNG summary charts.
+
+## Features
+
+- Upload source code files or paste code directly.
+- Optional programming language selection.
+- Automated bug detection.
+- Security auditing.
+- Deep architectural code review.
+- Task-based LLM routing.
+- Integration with Groq, Mistral, and Google Gemini.
+- Markdown review report generation.
+- Review summary metrics.
+- PNG summary chart generation.
+- Configurable chart generation (1–5 charts).
+
+## Technology Stack
+
+| Component | Technology |
+|---|---|
+| Programming Language | Python |
+| Frontend | Streamlit |
+| LLM Integration | LangChain |
+| Bug Detection | Groq |
+| Security Audit | Mistral |
+| Deep Code Review | Google Gemini |
+| Environment Management | python-dotenv |
+| Data Visualization | Matplotlib |
+| Report Generation | Markdown |
+
+## Project Structure
+
+```text
+aicode-reviewer/
+│
+├── agents/
+│   ├── reviewer.py
+│   └── router.py
+│
+├── animations/
+│   └── loader.py
+│
+├── output/
+│   ├── reports/
+│   └── charts/
+│
+├── Test_code_file/
+│   └── mainn.py
+│
+├── app.py
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+## Architecture
+
+The application consists of three main components:
+
+### 1. User Interface – `app.py`
+
+- Provides the Streamlit interface.
+- Handles source code uploads and direct code input.
+- Detects programming languages based on file extensions.
+- Allows users to specify a language hint.
+- Executes the full code review.
+- Displays review metrics and detailed results.
+- Generates downloadable Markdown reports and PNG charts.
+
+### 2. Review Engine – `agents/reviewer.py`
+
+The review engine coordinates three specialized review tasks through `run_full_review()`:
+
+- Bug Detection
+- Security Audit
+- Deep Code Review
+
+It collects the responses from all three LLM providers and returns them as a dictionary.
+
+### 3. LLM Router – `agents/router.py`
+
+The router manages LLM client initialization and task-based model selection.
+
+It defines five task types:
+
+- `QUICK_BUG`
+- `SECURITY_AUDIT`
+- `DEEP_REVIEW`
+- `MENTOR_CHAT`
+- `ANTI_PATTERN`
+
+The routing table maps each task to its corresponding LLM provider.
+
+## How It Works
+
+### Step 1: Code Input
+
+Users can submit source code through either of the following methods:
+
+- Upload a source code file.
+- Paste code directly into the Streamlit text area.
+
+An optional programming language hint can also be provided.
+
+### Step 2: Language Detection
+
+The application identifies the programming language using the uploaded file's extension.
+
+Supported file extensions:
+
+| Extension | Language |
+|---|---|
+| `.py` | Python |
+| `.js` | JavaScript |
+| `.ts` | TypeScript |
+| `.java` | Java |
+| `.c` | C |
+| `.cpp` | C++ |
+| `.cs` | C# |
+| `.go` | Go |
+| `.rb` | Ruby |
+| `.php` | PHP |
+| `.html` | HTML |
+| `.css` | CSS |
+
+Users can also manually provide a language hint.
+
+### Step 3: Run Full Review
+
+After submitting the code, users click the **Run Full Review** button.
+
+The application calls `run_full_review()` from `agents/reviewer.py`.
+
+### Step 4: Specialized Code Analysis
+
+The review engine executes three independent review passes.
+
+**Bug Detection – Groq**
+
+- Performs a quick scan of the submitted code.
+- Identifies potential bugs.
+- Uses the `QUICK_BUG` task type.
+
+**Security Audit – Mistral**
+
+- Analyzes the submitted code for potential security issues.
+- Uses the `SECURITY_AUDIT` task type.
+
+**Deep Code Review – Google Gemini**
+
+- Performs a comprehensive architectural review.
+- Uses the `DEEP_REVIEW` task type.
+
+### Step 5: Result Generation
+
+The responses from the three review passes are collected in a dictionary containing:
+
+- `bugs`
+- `security`
+- `deep_review`
+
+The results are displayed in separate sections in the Streamlit interface.
+
+### Step 6: Report and Chart Generation
+
+After the review is completed, the application:
+
+- Generates a Markdown report.
+- Calculates keyword-based review summary metrics.
+- Generates PNG summary charts.
+- Displays the generated charts in the application.
+
+---
+
+## Installation and Setup
+
+### Prerequisites
+
+- Python 3.10 or higher.
+- pip package manager.
+- API credentials for Groq, Mistral, and Google Gemini.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/iisamridhii/aicode-reviewer.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd aicode-reviewer
+```
+
+### 2. Create a Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+### 3. Activate the Virtual Environment
+
+**Windows PowerShell:**
 
 ```powershell
-python -m venv venv
 venv\Scripts\Activate.ps1
+```
+
+**Windows Command Prompt:**
+
+```cmd
+venv\Scripts\activate.bat
+```
+
+**Linux / macOS:**
+
+```bash
+source venv/bin/activate
+```
+
+### 4. Install Dependencies
+
+Install the packages listed in `requirements.txt`:
+
+```bash
 pip install -r requirements.txt
+```
+
+### 5. Configure API Keys
+
+Create a `.env` file in the root directory of the project.
+
+Add the following API credentials:
+
+```env
+GROQ_API_KEY=your_groq_api_key
+MISTRALAI_API_KEY=your_mistral_api_key
+GOOGLE_API_KEY=your_google_api_key
+```
+
+The application uses `load_dotenv()` from `python-dotenv` to load environment variables.
+
+**Note:** Keep your API credentials private. Do not upload your `.env` file to GitHub.
+
+### 6. Run the Application
+
+Execute the following command:
+
+```bash
 streamlit run app.py
 ```
 
-Open the Streamlit URL shown in the terminal (usually http://localhost:8501).
+After successful execution, Streamlit displays a local URL in the terminal.
 
-How the app works
------------------
+Open the URL in your browser:
 
-- Use the sidebar to upload a file or paste code and (optionally) set a language hint.
-- Click "Run Full Review" to run three review passes:
-	- Quick bug scan (`bugs`) — routed to a fast model.
-	- Security audit (`security`) — routed to a security-focused model.
-	- Deep, architectural review (`deep_review`) — routed to a large-context model.
-- The app saves a Markdown report to `output/reports` and PNG charts to `output/charts`.
+```text
+http://localhost:8501
+```
 
-Programmatic Example
----------------------
+---
+
+## Usage
+
+1. Launch the application.
+2. Open the sidebar containing the application settings.
+3. Upload a source code file or paste code directly into the text area.
+4. Optionally enter the programming language.
+5. Select the number of charts to generate using the slider.
+6. Click **Run Full Review**.
+7. Wait for the three review passes to complete.
+8. View the generated review summary and detailed results.
+9. Download the Markdown review report.
+
+---
+
+## Programmatic Usage
+
+The review engine can also be accessed independently of the Streamlit interface.
+
+Import the `run_full_review()` function:
 
 ```python
 from agents.reviewer import run_full_review
 
-code = "def add(a, b):\n    return a + b"
-results = run_full_review(code=code, language="Python")
-print(results.keys())  # -> dict_keys(['bugs', 'security', 'deep_review'])
+code = """
+def add(a, b):
+    return a + b
+"""
+
+results = run_full_review(
+    code=code,
+    language="Python"
+)
+
+print(results.keys())
 ```
 
-Configuration
--------------
+Expected output:
 
-- Put provider API keys in a `.env` file at the repo root or export them to your shell. `agents/router.py` calls `load_dotenv()`.
-- Example variables (names depend on provider integrations):
-
-```
-OPENAI_API_KEY=...
-MISTRALAI_API_KEY=...
-GROQ_API_KEY=...
-GOOGLE_API_KEY=...
+```python
+dict_keys(['bugs', 'security', 'deep_review'])
 ```
 
-Important Files
----------------
+The function returns a dictionary containing the responses from all three review passes.
 
-- `app.py` — Streamlit UI and orchestration.
-- `agents/reviewer.py` — runs the three review tasks.
-- `agents/router.py` — LLM client factories and routing logic.
-- `requirements.txt` — dependencies; ensures `streamlit` and the provider packages are installed.
+---
 
-Troubleshooting
----------------
+## Output
 
-- If Streamlit won't start: confirm the virtual environment is activated and `streamlit` is installed.
-- If LLM clients fail to initialize: confirm provider keys and the correct env var names for each LangChain integration.
-- Check the terminal where `streamlit run app.py` was started for tracebacks.
+The application generates two types of output files.
+
+### 1. Markdown Reports
+
+The application generates a Markdown report containing the results of the three review passes.
+
+Output directory:
+
+```text
+output/reports/
+```
+
+Report filenames are generated using the source filename.
+
+### 2. PNG Summary Charts
+
+The application generates PNG charts representing the review summary metrics.
+
+Output directory:
+
+```text
+output/charts/
+```
+
+Chart filenames follow this naming convention:
+
+```text
+review_summary_1.png
+review_summary_2.png
+review_summary_3.png
+```
+
+The number of charts generated depends on the value selected using the sidebar slider.
+
+---
+
+## Important Files
+
+| File | Description |
+|---|---|
+| `app.py` | Streamlit interface and application orchestration |
+| `agents/reviewer.py` | Executes the three specialized review tasks |
+| `agents/router.py` | Initializes LLM clients and handles task-based routing |
+| `animations/loader.py` | Contains the console loader function |
+| `requirements.txt` | Lists project dependencies |
+| `.gitignore` | Specifies files and directories excluded from Git |
+
+---
+
+## Troubleshooting
+
+### 1. Streamlit Command Not Found
+
+If the terminal does not recognize the Streamlit command:
+
+- Ensure the virtual environment is activated.
+- Verify that the dependencies have been installed.
+
+Run:
+
+```bash
+pip install -r requirements.txt
+```
+
+Then:
+
+```bash
+streamlit run app.py
+```
+
+### 2. LLM Client Initialization Errors
+
+If an LLM client fails to initialize:
+
+- Verify that the API key is valid.
+- Check the environment variable names.
+- Ensure the `.env` file is located in the project root.
+- Verify that the required provider packages are installed.
+
+### 3. Review Execution Errors
+
+If an error occurs during code review:
+
+- Check the terminal for the displayed error traceback.
+- Verify the provider API credentials.
+- Check the availability of the configured LLM provider.
+
+### 4. Empty Code Input
+
+If no source code is provided, the application displays a warning asking the user to upload a file or paste code before running the review.
+
+---
+
+## Repository
+
+GitHub Repository:
+
+https://github.com/iisamridhii/aicode-reviewer
+
 
